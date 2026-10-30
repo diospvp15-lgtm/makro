@@ -1,6 +1,6 @@
 // Offline-Fähigkeit: App-Dateien werden zwischengespeichert. Netzwerk zuerst,
 // damit Updates sofort ankommen; ohne Netz kommt die gespeicherte Fassung.
-const CACHE = 'makro-v1';
+const CACHE = 'makro-v2';
 const SHELL = [
   './',
   'index.html',
@@ -25,7 +25,8 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      // Nur eigene alte Caches löschen: andere Apps unter derselben Adresse nutzen denselben Cache-Speicher
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('makro-') && k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
